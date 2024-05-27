@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>计分器</title>
+    <link rel="stylesheet" href="css/a.css">
+    <script src="js/vue.js"></script>
+</head>
+<body>
+<center id="app">
+    <p class="tip">点击队名可修改</p>
+    <table>
+        <tr>
+            <td><input class="name" type="text" v-model="name1"></td>
+            <td><input class="name" type="text" v-model="name2"></td>
+        </tr>
+        <tr>
+            <td>
+				<p class="s1" v-if="type==0">{{tennis(b1)}}</p>
+				<p class="s1" v-else>{{b1}}</p>
+			</td>
+            <td>
+				<p class="s1" v-if="type==0">{{tennis(b2)}}</p>
+				<p class="s1" v-else>{{b2}}</p>
+			</td>
+        </tr>
+        <tr>
+            <td colspan="2">大比分</td>
+        </tr>
+        <tr>
+            <td>{{c1}}</td>
+            <td>{{c2}}</td>
+        </tr>
+        <tr>
+            <td><p class="b1 c2" @click="update(0,1)">-</p><p class="b1 c1" @click="update(1,1)">+</p></td>
+            <td><p class="b1 c2" @click="update(0,2)">-</p><p class="b1 c1" @click="update(1,2)">+</p></td>
+        </tr>
+        <tr>
+            <td colspan="2" class="c6" v-show="type>0">
+                计分：<input class="in" v-model="now" type="number">
+                进分：<input class="in" v-model="game" type="number">
+            </td>
+        </tr>
+        <tr>
+            <td colspan="2"><select class="type" @change="change" v-model="type"><option value="0">网球计分</option><option value="1">自由计分</option><option value="2">金球计分</option></select>
+            <p class="b3" @click="clear">清零</p></td>
+        </tr>
+    </table>
+	<p class="tip mark">@疯娃儿</p>
+</center>
+<script>
+    document.addEventListener('plusready', function(){
+   			//console.log("所有plus api都应该在此事件发生后调用，否则会出现plus is undefined。")
+   			
+   		});
+    const { createApp, ref } = Vue
+    createApp({
+      data() {
+        return {b1:0,b2:0,c1:0,c2:0,now:1,game:3,type:0,name1:'蓝队',name2:'红队'}
+      },
+      methods:{
+        update(a1,bb){
+            if(this.type==2){
+                this.now=parseInt(this.now)||1;
+            if(a1){
+                if(bb==1){this.b1+=this.now;if(this.b1>this.game){this.c1++;this.b1=this.b2=0;}}
+                else if(bb==2){this.b2+=this.now;if(this.b2>this.game){
+					this.c2++;this.b2=this.b1=0;
+					}}
+            }
+            else{
+                if(bb==1){ this.b1-=this.now;if(this.b1<0){this.b1=0;}}
+                else if(bb==2&&this.b2>0){this.b2-=this.now;if(this.b2<0){this.b2=0}}
+            }
+            }
+            else{//网球单独计分
+                if(a1){
+                if(bb==1){
+					this.b1+=this.now;
+					if(this.b2>this.game){this.b2=this.b1=this.game}
+					if(this.b1>this.game&&this.b1-this.b2>=2){
+						this.c1++;this.b1=0;this.b2=0;
+					}
+					}
+                else if(bb==2){
+					this.b2+=this.now;
+					if(this.b1>this.game){this.b1=this.b2=this.game}
+					if(this.b2>this.game&&this.b2-this.b1>=2){
+						this.c2++;this.b2=0;this.b1=0;
+						}
+					}
+                }
+                else{
+                    if(bb==1){ this.b1-=this.now;if(this.b1<0){this.b1=0;}}
+                    else if(bb==2&&this.b2>0){this.b2-=this.now;if(this.b2<0){this.b2=0}}
+                }
+            }
+            
+        },
+		tennis(aa){//网球分数显示
+			if(aa>3){return 'AD'}
+			if(aa==0){return aa}
+			if(aa==1){return 15}
+			if(aa==2){return 30}
+			if(aa==3){return 40}
+		},
+        change(){//改变模式
+            this.clear();
+        },
+        clear(){//清零
+            this.b1=this.b2=this.c1=this.c2=0;
+        }
+      }
+    }).mount('#app')
+</script>
+</body>
+</html>
